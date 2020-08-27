@@ -1,0 +1,48 @@
+#!/bin/sh
+shift # initial -c
+
+set -e
+
+socketdir=/tmp/pairing
+
+errpf() {
+	printf "$@" >&2
+}
+
+session_to_socket() {
+	if printf '%s' "$1" | grep -q '^\(host\|guest\) [a-z0-9-]\+$'; then
+		mkdir -p "$socketdir"
+		printf '%s/%s' "$socketdir" "${1##* }"
+	else
+		errpf 'Please provide provide an alphanumeric (and -) session name.\n'
+		exit 1
+	fi
+}
+
+case "$1" in
+host*)
+	socket="$(session_to_socket "$1")"
+	if [ -e "$socket" ]; then
+		errpf 'Duplicate session name, use another or be the guest.\n'
+		exit 1
+	else
+		socat - unix-listen:"$socket",fork,reuseaddr,unlink-early
+	fi
+	;;
+guest*)
+	socket="$(session_to_socket "$1")"
+	if [ -e "$socket" ]; then
+		socat unix:"$socket" -
+	else
+		errpf 'Session %s does not exist.\n' "$socket"
+		exit 1
+	fi
+	;;
+*)
+	errpf '%s\n' "$1"
+	errpf 'USAGE:\n'
+	errpf '    ssh pairing@mumble.ugent.be host <session-name>\n'
+	errpf '    ssh pairing@mumble.ugent.be guest <session-name>\n'
+	exit 1
+	;;
+esac

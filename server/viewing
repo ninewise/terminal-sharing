@@ -1,0 +1,20 @@
+#!/bin/sh
+shift
+
+if ! printf '%s' "$1" | grep -q '^[a-z0-9-]\+$'; then
+	echo 'Please provide an alphanumeric (and -) session name'
+	exit 1
+fi
+
+if test ! -f /tmp/socks/"$1"; then
+	sleep 1
+	printf 'Session %s does not exist.\n' "$1"
+	exit 1
+fi
+
+socket="$(mktemp)"
+rm "$socket"
+tail -c0 -f /tmp/socks/"$1" | socat -u - unix-listen:"$socket",reuseaddr,fork,unlink-early &
+sleep 1
+abduco -a -l -e ' ' -r "$socket"
+rm "$socket"
