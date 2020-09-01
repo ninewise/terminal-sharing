@@ -8,7 +8,7 @@ fi
 
 socket="$(mktemp)"
 rm "$socket"
-abduco -n "$socket" dvtm
+SESSION_NAME="$1" SESSION_SOCKET="$socket" abduco -n "$socket" dvtm
 
 socat -u unix-connect:"$socket" exec:"ssh -M felix@mumble.ugent.be 'socat -u - create:/tmp/socks/$1,unlink-early,mode=777'" &
 socatpid="$!"

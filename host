@@ -1,11 +1,11 @@
 #!/bin/sh
 set -e
 
+session="$(uuidgen)"
+
 socket="$(mktemp)"
 rm "$socket"
-abduco -n "$socket"
-
-session="$(uuidgen)"
+SESSION_NAME="$session" SESSION_SOCKET="$socket" abduco -n "$socket"
 
 echo "Session ID (copy this): $session"
 sleep 5
