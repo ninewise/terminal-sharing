@@ -13,8 +13,8 @@ if test ! -f /tmp/socks/"$1"; then
 fi
 
 socket="$(mktemp)"
+trap "rm '$socket'" EXIT KILL
 rm "$socket"
 tail -c0 -f /tmp/socks/"$1" | socat -u - unix-listen:"$socket",reuseaddr,fork,unlink-early &
 sleep 1
 abduco -a -l -e ' ' -r "$socket"
-rm "$socket"

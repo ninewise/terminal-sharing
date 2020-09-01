@@ -22,6 +22,7 @@ session_to_socket() {
 case "$1" in
 host*)
 	socket="$(session_to_socket "$1")"
+	trap "rm '$socket'" EXIT KILL
 	if [ -e "$socket" ]; then
 		errpf 'Duplicate session name, use another or be the guest.\n'
 		exit 1
@@ -31,6 +32,7 @@ host*)
 	;;
 guest*)
 	socket="$(session_to_socket "$1")"
+	trap "rm '$socket'" EXIT KILL
 	if [ -e "$socket" ]; then
 		socat unix:"$socket" -
 	else
