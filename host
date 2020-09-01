@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+
+socket="$(mktemp)"
+rm "$socket"
+abduco -n "$socket"
+
+session="$(uuidgen)"
+
+echo "$session"
+sleep 5
+
+socat unix:"$socket" exec:"ssh -M pairing@mumble.ugent.be 'host $session'" &
+socatpid="$!"
+
+read -p 'Press enter to start...' unused
+
+abduco -a "$socket"
+
+kill "$socatpid"
+wait

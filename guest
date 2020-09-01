@@ -1,0 +1,19 @@
+#!/bin/sh
+set -e
+
+if ! printf '%s' "$1" | grep '^[a-z0-9-]\+$'; then
+	echo 'Please provide an alphanumeric (and -) session name'
+	exit 1
+fi
+
+socket="$(mktemp)"
+rm "$socket"
+
+socat exec:"ssh -M pairing@mumble.ugent.be 'guest $1'" unix-listen:"$socket",fork,reuseaddr,unlink-early &
+socatpid="$!"
+sleep 1
+
+abduco -a "$socket"
+
+kill "$socatpid"
+wait

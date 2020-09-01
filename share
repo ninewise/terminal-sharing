@@ -1,0 +1,26 @@
+#!/bin/sh
+set -e
+
+if ! printf '%s' "$1" | grep '^[a-z0-9-]\+$'; then
+	echo 'Please provide an alphanumeric (and -) session name'
+	exit 1
+fi
+
+socket="$(mktemp)"
+rm "$socket"
+abduco -n "$socket" dvtm
+
+socat -u unix-connect:"$socket" exec:"ssh -M felix@mumble.ugent.be 'socat -u - create:/tmp/socks/$1,unlink-early,mode=777'" &
+socatpid="$!"
+sleep 3
+
+while pkill -SIGWINCH dvtm; do
+	sleep 1
+done &
+sleeppid="$!"
+
+abduco -a "$socket"
+
+kill "$sleeppid"
+kill "$socatpid"
+wait
