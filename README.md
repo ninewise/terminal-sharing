@@ -27,18 +27,18 @@ Clone or download this repository.
 
 Run `./view <lecture>`, replacing `<lecture>` with the lecture name your lecturer gave you.
 
-You should get a view of the terminal emulator of your lecturer in yours.
+You should get a view of the terminal emulator of your lecturer in yours. Press the space bar to leave.
 
 ### Pair programming
 
-For one-on-one pair programming. The host should run the `host` script. The script will print out a session ID which should be shared with the guest. Then, it will open a new shell which is controlled by both the host and the guest. Yes, there may be remote code execution.
+For one-on-one pair programming. The host should run the `host` script. The script will print out a session ID which should be shared with the guest. Then, it will open a new shell which is controlled by both the host and the guest. Yes, there may be remote code execution. Exit the shell to stop sharing.
 
 ```sh
 $ ./host
 Session ID: e989a26d-17dd-4d8e-bad3-43074f813148
 ```
 
-The guest receives a session ID from the host and passes this to the `guest` script.
+The guest receives a session ID from the host and passes this to the `guest` script. Press `Ctrl+\` to leave (or exit the shell, or shut down their computer).
 
 ```sh
 $ ./guest e989a26d-17dd-4d8e-bad3-43074f813148
