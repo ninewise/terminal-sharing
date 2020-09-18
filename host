@@ -1,21 +1,36 @@
 #!/bin/sh
+pairinguser="pairing@mumble.ugent.be"
+
 set -e
 
+abduco     > /dev/null 2>&1 || { echo 'abduco found: no' && exit 1; }
+socat -h   > /dev/null 2>&1 || { echo 'socat found: no' && exit 1; }
+ssh -V     > /dev/null 2>&1 || { echo 'ssh found: no' && exit 1; }
+uuidgen -V > /dev/null 2>&1 || { echo 'uuidgen found: no' && exit 1; }
+
+# Create a temporary directory for our sockets
+umask 077
+socketdir="$(mktemp -d)"
+trap "rm -rf '$socketdir'" EXIT
+
+# Invent a secret session name
 session="$(uuidgen)"
+read -p "Copy this session key and hit enter to start: $session" unused
 
-socket="$(mktemp)"
-rm "$socket"
-SESSION_NAME="$session" SESSION_SOCKET="$socket" abduco -n "$socket"
+# Create the session in which you'll host, in the background
+SESSION_NAME="$session" SESSION_SOCKET="$socketdir/abduco" abduco -n "$socketdir/abduco"
 
-echo "Session ID (copy this): $session"
-sleep 5
+# Create an SSH master connection in the background, to allow asking for passphrases
+ssh -N -f -M -S "$socketdir/ssh" "$pairinguser"
 
-socat unix:"$socket" exec:"ssh -M pairing@mumble.ugent.be 'host $session'" &
+# Connect our sessions socket to a remote socket over our existing ssh connection
+socat unix:"$socket" exec:"ssh -S '$socketdir/ssh' '$pairinguser' 'host $session'" &
 socatpid="$!"
 
-read -p 'Press enter to start...' unused
+# Attach to the session created earlier
+abduco -a "$socketdir/abduco"
 
-abduco -a "$socket"
-
+# Close in reverse order
 kill "$socatpid"
+ssh -O exit -S "$socketdir/ssh" "$pairinguser"
 wait

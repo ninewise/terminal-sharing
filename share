@@ -1,26 +1,44 @@
 #!/bin/sh
+shareuser="felix@mumble.ugent.be"
+
 set -e
+
+abduco   > /dev/null 2>&1 || { echo 'abduco found: no' && exit 1; }
+dvtm -v  > /dev/null 2>&1 || { echo 'dvtm found: no' && exit 1; }
+socat -h > /dev/null 2>&1 || { echo 'socat found: no' && exit 1; }
+ssh -V   > /dev/null 2>&1 || { echo 'ssh found: no' && exit 1; }
 
 if ! printf '%s' "$1" | grep '^[a-z0-9-]\+$'; then
 	echo 'Please provide an alphanumeric (and -) session name'
 	exit 1
 fi
 
-socket="$(mktemp)"
-rm "$socket"
-SESSION_NAME="$1" SESSION_SOCKET="$socket" abduco -n "$socket" dvtm
+# Create a temporary directory for our sockets
+umask 077
+socketdir="$(mktemp -d)"
+trap "rm -rf '$socketdir'" EXIT
 
-socat -u unix-connect:"$socket" exec:"ssh -M felix@mumble.ugent.be 'socat -u - create:/tmp/socks/$1,unlink-early,mode=777'" &
+# Create the session in which we'll teach, in the background
+SESSION_NAME="$1" SESSION_SOCKET="$socketdir/abduco" abduco -n "$socketdir/abduco" dvtm
+
+# Create an SSH master connection in the background, to allow asking for passphrases
+ssh -N -f -M -S "$socketdir/ssh" "$shareuser"
+
+# Connect our sessions socket to a remote file over our existing ssh connection
+socat -u unix-connect:"$socketdir/abduco" exec:"ssh -S '$socketdir/ssh' '$shareuser' 'socat -u - create:/tmp/socks/$1,unlink-early,mode=777'" &
 socatpid="$!"
-sleep 3
 
+# Keep 'resizing' our screen to resend the whole thing
 while pkill -SIGWINCH dvtm; do
 	sleep 1
 done &
-sleeppid="$!"
+resizepid="$!"
 
-abduco -a "$socket"
+# Attach to the session created earlier
+abduco -a "$socketdir/abduco"
 
-kill "$sleeppid"
+# Close in reverse order
+kill "$resizepid"
 kill "$socatpid"
+ssh -O exit -S "$socketdir/ssh" "$shareuser"
 wait
