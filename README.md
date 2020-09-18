@@ -13,6 +13,7 @@ Clone or download this repository.
 | socat       |                  | required        | required         |
 | dvtm        |                  | required        |                  |
 | uuidgen     |                  |                 | required on host |
+| not Windows |                  | required        | required         |
 
 ### Installation links (or use your package manager)
 
@@ -20,12 +21,15 @@ Clone or download this repository.
 - [abduco](https://github.com/martanne/abduco)
 - [dvtm](https://github.com/martanne/dvtm)
 - uuidgen: in your util-linux package, or something similar
+- [Not windows](https://search.snopyta.org/?q=install+linux)
 
 ## Usage
 
 ### Viewing a lecture
 
 Before you start: press the space bar to leave. Run `./view <lecture>`, replacing `<lecture>` with the lecture name your lecturer gave you. You should get a view of the terminal emulator of your lecturer in yours.
+
+**On windows?** The script won't work for you, but if you have SSH on your computer (and you probably do), just running the command on the second line in the `view` script in a large command prompt window should work.
 
 ### Pair programming
 
