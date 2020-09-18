@@ -25,13 +25,11 @@ Clone or download this repository.
 
 ### Viewing a lecture
 
-Run `./view <lecture>`, replacing `<lecture>` with the lecture name your lecturer gave you.
-
-You should get a view of the terminal emulator of your lecturer in yours. Press the space bar to leave.
+Before you start: press the space bar to leave. Run `./view <lecture>`, replacing `<lecture>` with the lecture name your lecturer gave you. You should get a view of the terminal emulator of your lecturer in yours.
 
 ### Pair programming
 
-For one-on-one pair programming. The host should run the `host` script. The script will print out a session ID which should be shared with the guest. Then, it will open a new shell which is controlled by both the host and the guest. Yes, there may be remote code execution. Exit the shell to stop sharing.
+For one-on-one pair programming. The host should run the `host` script. The script will print out a session ID which should be shared with the guest. Then, it will open a new shell which is controlled by both the host and the guest. Yes, there may be remote code execution. Exit the shell to stop hosting.
 
 ```sh
 $ ./host
@@ -48,7 +46,7 @@ $ ./guest e989a26d-17dd-4d8e-bad3-43074f813148
 
 Run `./share <lecture>`, replacing `<lecture>` with a nice name for your lecture (alphanumeric and - allowed).
 
-Share the name of your lecture with your students so they can get a view of your terminal emulator.
+Share the name of your lecture with your students so they can get a view of your terminal emulator. Exit the shell to stop sharing.
 
 ## Server setup
 
