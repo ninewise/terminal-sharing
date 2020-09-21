@@ -11,7 +11,7 @@ Clone or download this repository.
 | SSH & shell | required         | required        | required         |
 | abduco      |                  | required        | required         |
 | socat       |                  | required        | required         |
-| dvtm        |                  | required        |                  |
+| dvtm        |                  | required        | required on host |
 | uuidgen     |                  |                 | required on host |
 | not Windows |                  | required        | required         |
 
