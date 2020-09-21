@@ -7,6 +7,7 @@ abduco   > /dev/null 2>&1 || { echo 'abduco found: no' && exit 1; }
 socat -h > /dev/null 2>&1 || { echo 'socat found: no' && exit 1; }
 ssh -V   > /dev/null 2>&1 || { echo 'ssh found: no' && exit 1; }
 uuidgen  > /dev/null 2>&1 || { echo 'uuidgen found: no' && exit 1; }
+dvtm -v  > /dev/null 2>&1 || { echo 'dvtm found: no' && exit 1; }
 
 # Create a temporary directory for our sockets
 umask 077
@@ -24,13 +25,13 @@ SESSION_NAME="$session" SESSION_SOCKET="$socketdir/abduco" abduco -n "$socketdir
 ssh -N -f -M -S "$socketdir/ssh" "$pairinguser"
 
 # Connect our sessions socket to a remote socket over our existing ssh connection
-socat unix:"$socket" exec:"ssh -S '$socketdir/ssh' '$pairinguser' 'host $session'" &
+socat unix:"$socketdir/abduco" exec:"ssh -S '$socketdir/ssh' '$pairinguser' 'host $session'" &
 socatpid="$!"
 
 # Attach to the session created earlier
 abduco -a "$socketdir/abduco"
 
 # Close in reverse order
-kill "$socatpid"
+kill "$socatpid" || true
 ssh -O exit -S "$socketdir/ssh" "$pairinguser"
 wait
