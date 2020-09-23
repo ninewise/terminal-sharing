@@ -3,9 +3,12 @@ pairinguser="pairing@mumble.ugent.be"
 
 set -e
 
-abduco   > /dev/null 2>&1 || { echo 'abduco found: no' && exit 1; }
-socat -h > /dev/null 2>&1 || { echo 'socat found: no' && exit 1; }
-ssh -V   > /dev/null 2>&1 || { echo 'ssh found: no' && exit 1; }
+for COMMAND in abduco socat ssh; do
+	if ! command -v $COMMAND > /dev/null 2>&1; then
+		printf '%s found: no\n' "$COMMAND"
+		exit
+	fi
+done
 
 if ! printf '%s' "$1" | grep '^[a-z0-9-]\+$'; then
 	echo 'Please provide an alphanumeric (and -) session name'

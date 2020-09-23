@@ -3,11 +3,9 @@ pairinguser="pairing@mumble.ugent.be"
 
 set -e
 
-for COMMAND in abduco socat ssh uuidgen dvtm
-do
-	if ! command -v $COMMAND &> /dev/null
-	then
-		echo $COMMAND 'found: no'
+for COMMAND in abduco socat ssh uuidgen dvtm; do
+	if ! command -v $COMMAND > /dev/null 2>&1; then
+		printf '%s found: no\n' "$COMMAND"
 		exit
 	fi
 done
