@@ -1,4 +1,5 @@
 #!/bin/sh
+SERVER="${SERVER:-mumble.ugent.be}"
 shift # initial -c
 
 set -e
@@ -43,8 +44,8 @@ guest*)
 *)
 	errpf '%s\n' "$1"
 	errpf 'USAGE:\n'
-	errpf '    ssh pairing@mumble.ugent.be host <session-name>\n'
-	errpf '    ssh pairing@mumble.ugent.be guest <session-name>\n'
+	errpf '    ssh pairing@$SERVER host <session-name>\n'
+	errpf '    ssh pairing@$SERVER guest <session-name>\n'
 	exit 1
 	;;
 esac

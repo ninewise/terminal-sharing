@@ -1,5 +1,6 @@
 #!/bin/sh
-pairinguser="pairing@mumble.ugent.be"
+SERVER="${SERVER:-Mumble}"
+pairinguser="pairing@$SERVER"
 
 set -e
 

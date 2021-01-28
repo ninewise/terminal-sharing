@@ -1,2 +1,3 @@
 #!/bin/sh
-ssh -o ServerAliveInterval=15 -o TCPKeepAlive=no -t viewing@mumble.ugent.be "$1"
+SERVER="${SERVER:-Mumble}"
+ssh -o ServerAliveInterval=15 -o TCPKeepAlive=no -t viewing@"$SERVER" "$1"
