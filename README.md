@@ -2,6 +2,41 @@
 
 Some script to share abduco sessions with socat and SSH.
 
+## Server setup
+
+Lecture viewing and pair programming require the same setup, with a different script. Do this twice (with a different user) if you want both.
+
+Choose a username, e.g. pairing. Append to `/etc/ssh/sshd_config` the lines below:
+
+```
+PrintLastLog no
+Match User pairing
+	AllowTcpForwarding no
+	X11Forwarding no
+	PermitTunnel no
+	GatewayPorts no
+	AllowAgentForwarding no
+	PasswordAuthentication yes
+	PermitEmptyPasswords yes
+```
+
+Also comment the `AcceptEnv` line to avoid locale warnings and add `pairing` to the `AllowUsers` list.
+
+If using pam, modify `/etc/pam.d/common-auth` to change `nullok_secure` to `nullok` to permit empty passwords with pam (as per https://superuser.com/questions/1152645/openssh-server-anonymous-account). Modify `/etc/pam.d/sshd` to comment out the two motd lines.
+
+Create the user with the `server/viewing` (for lecture viewing) or `server/pairing` (for pair programming) script as shell and an empty password:
+
+```sh
+sudo useradd -m -s /home/pairing/shell pairing
+sudo su -s /bin/sh pairing
+cp <the script> shell
+chmod 500 shell
+exit
+sudo passwd -d pairing
+```
+
+Fork this repository and change the `SERVER` constant in the scripts (or instruct your student to change it).
+
 ## Client setup
 
 Clone or download this repository.
@@ -51,38 +86,3 @@ $ ./guest e989a26d-17dd-4d8e-bad3-43074f813148
 Run `./share <lecture>`, replacing `<lecture>` with a nice name for your lecture (alphanumeric and - allowed).
 
 Share the name of your lecture with your students so they can get a view of your terminal emulator. Exit the shell to stop sharing.
-
-## Server setup
-
-Lecture viewing and pair programming require the same setup, with a different script. Do this twice (with a different user) if you want both.
-
-Choose a username, e.g. pairing. Append to `/etc/ssh/sshd_config` the lines below:
-
-```
-PrintLastLog no
-Match User pairing
-	AllowTcpForwarding no
-	X11Forwarding no
-	PermitTunnel no
-	GatewayPorts no
-	AllowAgentForwarding no
-	PasswordAuthentication yes
-	PermitEmptyPasswords yes
-```
-
-Also comment the `AcceptEnv` line to avoid locale warnings and add `pairing` to the `AllowUsers` list.
-
-If using pam, modify `/etc/pam.d/common-auth` to change `nullok_secure` to `nullok` to permit empty passwords with pam (as per https://superuser.com/questions/1152645/openssh-server-anonymous-account). Modify `/etc/pam.d/sshd` to comment out the two motd lines.
-
-Create the user with the `server/viewing` (for lecture viewing) or `server/pairing` (for pair programming) script as shell and an empty password:
-
-```sh
-sudo useradd -m -s /home/pairing/shell pairing
-sudo su -s /bin/sh pairing
-cp <the script> shell
-chmod 500 shell
-exit
-sudo passwd -d pairing
-```
-
-Fork this repository and change the `SERVER` constant in the scripts (or instruct your student to change it).
